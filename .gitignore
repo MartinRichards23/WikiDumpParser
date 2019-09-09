@@ -1,0 +1,9 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/WikiDumpParser/bin
+/WikiDumpParser/obj
+/WikiTest/bin
+/WikiTest/obj
