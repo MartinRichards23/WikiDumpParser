@@ -24,6 +24,7 @@ using WikiDumpParser;
 using System.IO.Compression;
 using ICSharpCode.SharpZipLib.BZip2;
 using System.Net;
+using Microsoft.Win32;
 
 namespace Demo
 {
@@ -34,54 +35,96 @@ namespace Demo
     public partial class MainWindow : Window
     {
         int redirectsCount = 0;
+        int pageCount = 0;
         int articleCount = 0;
         int lastCount = 0;
+
+        CancellationTokenSource cancelTokenSource;
 
         public MainWindow()
         {
             InitializeComponent();
+            panelControls.Visibility = Visibility.Visible;
+            panelProgress.Visibility = Visibility.Hidden;
         }
 
-        private async Task ProcessDump(Stream inputStream)
+        private async Task ProcessDump(Stream inputStream, long contentLength)
         {
+            cancelTokenSource?.Cancel();
+            cancelTokenSource = new CancellationTokenSource();
+
+            panelControls.Visibility = Visibility.Hidden;
+            panelProgress.Visibility = Visibility.Visible;
+
             try
             {
                 using (BZip2InputStream stream = new BZip2InputStream(inputStream))
                 {
                     Parser parser = Parser.Create(stream);
 
+                    CancellationToken token = cancelTokenSource.Token;
+
                     await Task.Run(() =>
                     {
-                        foreach (Article article in parser.ReadArticles())
+                        foreach (WikiDumpParser.Models.Page page in parser.ReadPages())
                         {
-                            if (article.IsRedirect)
+                            token.ThrowIfCancellationRequested();
+
+                            pageCount++;
+
+                            if (page.IsRedirect)
                             {
                                 redirectsCount++;
                             }
-                            else if (article.Namespace == 0)
+                            else
                             {
-                                articleCount++;
-                                lastCount++;
+                                if (page.Namespace == 0)
+                                    articleCount++;
+                            }
+
+                            // update status every 10 articles
+                            if (pageCount % 10 == 0)
+                            {
+                                float percent = inputStream.Position / (float)contentLength;
+                                Dispatcher.BeginInvoke(() => { UpdateStatus(percent); });
                             }
                         }
                     });
                 }
             }
+            catch (OperationCanceledException) { }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
             finally
             {
-
+                panelControls.Visibility = Visibility.Visible;
+                panelProgress.Visibility = Visibility.Hidden;
             }
+        }
+
+        private void UpdateStatus(float percent)
+        {
+            progessBar.Value = percent * 100;
+            txtProgress.Text = $"{percent:P} Pages: {pageCount}";
         }
 
         private async void BtnParse_Click(object sender, RoutedEventArgs e)
         {
-            using (FileStream fs = File.OpenRead(@"C:\Users\marti\Downloads\enwiki-latest-pages-articles.xml.bz2"))
+            OpenFileDialog dlg = new OpenFileDialog()
             {
-                await ProcessDump(fs);
+                Filter = "latest articles bz2|*.bz2",
+            };
+
+            if (dlg.ShowDialog() != true)
+            {
+                return;
+            }
+
+            using (Stream fs = dlg.OpenFile())
+            {
+                await ProcessDump(fs, fs.Length);
             }
         }
 
@@ -91,8 +134,13 @@ namespace Demo
             using (HttpWebResponse response = (HttpWebResponse)(request.GetResponse()))
             using (Stream receiveStream = response.GetResponseStream())
             {
-                await ProcessDump(receiveStream);
+                await ProcessDump(receiveStream, response.ContentLength);
             }
+        }
+
+        private void BtnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            cancelTokenSource?.Cancel();
         }
     }
 

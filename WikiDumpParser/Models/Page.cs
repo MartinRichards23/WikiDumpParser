@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace WikiDumpParser.Models
 {
-    public class Article
+    public class Page
     {
-        public Article(int id, int namespaceKey, string redirect, string title, string text)
+        public Page(int id, int namespaceKey, string redirect, string title, string text)
         {
             Id = id;
             Namespace = namespaceKey;

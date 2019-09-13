@@ -33,7 +33,7 @@ namespace WikiDumpParser
         /// <summary>
         /// Enumerate the articles in the database dump
         /// </summary>
-        public IEnumerable<Article> ReadArticles()
+        public IEnumerable<Page> ReadPages()
         {
             XNamespace nss = "http://www.mediawiki.org/xml/export-0.10/";
             
@@ -54,9 +54,9 @@ namespace WikiDumpParser
                 string redirectTitle = redirectNode?.Attribute("title").Value;
                 string text = textNode.Value;
 
-                Article article = new Article(id, nsKey, redirectTitle, title, text);
+                Page page = new Page(id, nsKey, redirectTitle, title, text);
 
-                yield return article;
+                yield return page;
             }
         }
 

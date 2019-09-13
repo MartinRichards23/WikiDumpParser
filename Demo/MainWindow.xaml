@@ -3,12 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525">
     <DockPanel>
-        <StackPanel x:Name="panelControls">
-            <Button x:Name="btnOpenFile" Content="Open File" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Click="BtnParse_Click" />
-            <Button x:Name="btnDownloadFile" Content="Download File" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Click="BtnDownloadFile_Click" />
-        </StackPanel>
-        
-        <TextBlock Name="txtProgress" HorizontalAlignment="Left" Margin="10,35,0,0" TextWrapping="Wrap" Text="Progress" VerticalAlignment="Top" Width="454"/>
+        <Grid DockPanel.Dock="Top" Margin="6">
+            <StackPanel x:Name="panelControls" Visibility="Hidden" >
+                <Button x:Name="btnOpenFile" Content="Open File" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Click="BtnParse_Click" />
+                <Button x:Name="btnDownloadFile" Content="Download File" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="100" Click="BtnDownloadFile_Click" />
+            </StackPanel>
+            <StackPanel x:Name="panelProgress" Visibility="Visible" >
+                <Button x:Name="btnCancel" Content="Cancel" Width="100" HorizontalAlignment="Left" Click="BtnCancel_Click" />
+
+                <Grid Height="32" Margin="0,6,0,0">
+                    <ProgressBar x:Name="progessBar" />
+                    <TextBlock x:Name="txtProgress" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                </Grid>
+
+            </StackPanel>
+        </Grid>
 
     </DockPanel>
 </Window>
