@@ -25,6 +25,7 @@ using System.IO.Compression;
 using ICSharpCode.SharpZipLib.BZip2;
 using System.Net;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace Demo
 {
@@ -34,6 +35,7 @@ namespace Demo
     /// </summary>
     public partial class MainWindow : Window
     {
+        DateTime startTime;
         int redirectsCount = 0;
         int pageCount = 0;
         int articleCount = 0;
@@ -66,6 +68,12 @@ namespace Demo
 
                     await Task.Run(() =>
                     {
+                        startTime = DateTime.UtcNow;
+                        redirectsCount = 0;
+                        pageCount = 0;
+                        articleCount = 0;
+                        lastCount = 0;
+
                         foreach (WikiDumpParser.Models.Page page in parser.ReadPages())
                         {
                             token.ThrowIfCancellationRequested();
@@ -82,8 +90,8 @@ namespace Demo
                                     articleCount++;
                             }
 
-                            // update status every 10 articles
-                            if (pageCount % 10 == 0)
+                            // update status every 100 articles
+                            if (pageCount % 100 == 0)
                             {
                                 float percent = inputStream.Position / (float)contentLength;
                                 Dispatcher.BeginInvoke(() => { UpdateStatus(percent); });
