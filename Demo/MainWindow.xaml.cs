@@ -74,7 +74,7 @@ namespace Demo
                         articleCount = 0;
                         lastCount = 0;
 
-                        foreach (WikiDumpParser.Models.Page page in parser.ReadPages())
+                        foreach (var page in parser.ReadPages())
                         {
                             token.ThrowIfCancellationRequested();
 
@@ -97,7 +97,7 @@ namespace Demo
                                 Dispatcher.BeginInvoke(() => { UpdateStatus(percent); });
                             }
                         }
-                    });
+                    }, token);
                 }
             }
             catch (OperationCanceledException) { }
