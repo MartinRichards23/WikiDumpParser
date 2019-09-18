@@ -50,7 +50,7 @@ namespace Demo
             panelProgress.Visibility = Visibility.Hidden;
         }
 
-        private async Task ProcessDump(Stream inputStream, long contentLength)
+        private async Task ProcessDump(Stream inputStream)
         {
             cancelTokenSource?.Cancel();
             cancelTokenSource = new CancellationTokenSource();
@@ -93,11 +93,12 @@ namespace Demo
                             // update status every 100 articles
                             if (pageCount % 100 == 0)
                             {
-                                float percent = inputStream.Position / (float)contentLength;
-                                Dispatcher.BeginInvoke(() => { UpdateStatus(percent); });
+                                Dispatcher.BeginInvoke(() => { UpdateStatus(); });
                             }
                         }
                     }, token);
+
+                    UpdateStatus();
                 }
             }
             catch (OperationCanceledException) { }
@@ -112,10 +113,9 @@ namespace Demo
             }
         }
 
-        private void UpdateStatus(float percent)
+        private void UpdateStatus()
         {
-            progessBar.Value = percent * 100;
-            txtProgress.Text = $"{percent:P} Pages: {pageCount}";
+            txtProgress.Text = $"Pages: {pageCount}";
         }
 
         private async void BtnParse_Click(object sender, RoutedEventArgs e)
@@ -132,7 +132,7 @@ namespace Demo
 
             using (Stream fs = dlg.OpenFile())
             {
-                await ProcessDump(fs, fs.Length);
+                await ProcessDump(fs);
             }
         }
 
@@ -142,7 +142,7 @@ namespace Demo
             using (HttpWebResponse response = (HttpWebResponse)(request.GetResponse()))
             using (Stream receiveStream = response.GetResponseStream())
             {
-                await ProcessDump(receiveStream, response.ContentLength);
+                await ProcessDump(receiveStream);
             }
         }
 

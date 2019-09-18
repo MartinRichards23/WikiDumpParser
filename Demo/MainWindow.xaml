@@ -12,7 +12,7 @@
                 <Button x:Name="btnCancel" Content="Cancel" Width="100" HorizontalAlignment="Left" Click="BtnCancel_Click" />
 
                 <Grid Height="32" Margin="0,6,0,0">
-                    <ProgressBar x:Name="progessBar" />
+                    <ProgressBar x:Name="progessBar"  IsIndeterminate="True" />
                     <TextBlock x:Name="txtProgress" VerticalAlignment="Center" HorizontalAlignment="Center" />
                 </Grid>
 
