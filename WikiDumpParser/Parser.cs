@@ -7,6 +7,9 @@ using WikiDumpParser.Models;
 
 namespace WikiDumpParser
 {
+    /// <summary>
+    /// A parser of the XML Wiki dump
+    /// </summary>
     public class Parser
     {
         readonly XmlReader xmlReader;
@@ -63,6 +66,5 @@ namespace WikiDumpParser
 
             return parser;
         }
-
     }
 }
